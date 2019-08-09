@@ -1,0 +1,13 @@
+wqsequence_id	ercc_dil	sheet	cover	time
+S12	6.66E+05	LMDII	ethanol	no
+S13	6.66E+05	LMDII	ethanol	no
+S14	6.66E+05	IIC9	ethanol	no
+S15	6.66E+05	IIC9	ethanol	no
+S16	6.66E+05	IIC9	ISO	5m
+S17	6.66E+05	IIC9	ISO	5m
+S18	6.66E+05	IIC9	OPti	5m
+S19	6.66E+05	IIC9	OPti	5m
+S20	6.66E+05	IIC9	ISO	1h
+S21	6.66E+05	IIC9	ISO	1h
+S22	6.66E+05	IIC9	OPti	1h
+S23	6.66E+05	IIC9	OPti	1h

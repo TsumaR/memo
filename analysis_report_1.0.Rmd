@@ -1,0 +1,359 @@
+---
+title: "analysis report 1.0"
+author: "Ryota Wagatsuma"
+output:
+  html_document: default
+date: "2019/07/13"
+---
+
+```{r setup, include=FALSE}
+library(ggplot2)
+library(tidyverse)
+library(dplyr)
+library(ggrepel)
+
+knitr::opts_chunk$set(echo = FALSE, warning = F, error = F, message = F, cache = F)
+options(width = 1000)
+dpi <- 100
+bar.matrix.w  <- 9.2; bar.matrix.h  <- 6.2
+tile.matrix.w <- 9.2; tile.matrix.h <- 2.8
+heatmap.w <- 4; heatmap.h <- 6.5
+scatter.w <- 8.3; scatter.h <- 7.5
+knitr::opts_template$set(
+  scatter.matrix = list(out.width  = scatter.w * dpi, fig.width  = scatter.w, 
+                        out.height = scatter.h * dpi, fig.height = scatter.h),
+  bar.matrix = list(out.width  = bar.matrix.w * dpi, fig.width  = bar.matrix.w, 
+                    out.height = bar.matrix.h * dpi, fig.height = bar.matrix.h),
+  heatmap = list(out.width  = heatmap.w * dpi, fig.width  = heatmap.w, 
+                 out.height = heatmap.h * dpi, fig.height = heatmap.h),
+  heatmap2 = list(out.width  = heatmap.w * dpi, fig.width  = heatmap.w, 
+                  out.height = 2 * heatmap.h * dpi, fig.height = 2 * heatmap.h),
+  heatmap1.5 = list(out.width  = heatmap.w * dpi, fig.width  = heatmap.w, 
+                    out.height = 1.5 * heatmap.h * dpi, fig.height = 1.5 * heatmap.h),
+  tile.matrix = list(out.width  = tile.matrix.w * dpi, fig.width  = tile.matrix.w, 
+                     out.height = tile.matrix.h * dpi, fig.height = tile.matrix.h))
+
+#reportにコードやエラー内容を表示させない
+knitr::opts_template$set(
+  type0 = list(fig.height = 3.6),
+  type1 = list(fig.height = 4.2),
+  type2 = list(fig.height = 4.6))
+#---------------------------------------------------------------#
+#---- white theme for ggplot2 ----#
+gg.basic.theme <- function(){
+  theme(panel.background = element_rect(fill = "white", colour = "grey50"),
+        panel.grid.major = element_line(colour = "#f0f0f0"),
+        strip.text = element_text(colour = "white"),
+        strip.background = element_rect(fill = "grey50", colour = "grey50"),
+        plot.margin = unit(c(1, 1, 1, 1), "lines"),
+        legend.key = element_rect(fill = "transparent", colour = "transparent"),
+        text = element_text(size = 10))
+}
+
+#---- gene_biotype to large category ----#
+to.large_category <- function(gene_biotype){
+  len <- length(gene_biotype)
+  idx <- 1:len
+  ctg <- rep(NA, len)
+  ctg[grep("target_fg", gene_biotype)] <- "other"
+  ctg[grep("transgenic", gene_biotype)] <- "other"
+  ctg[grep("protein_coding", gene_biotype)] <- "PCGs"
+  ctg[grep("pseudo", gene_biotype)] <- "pseudo"
+  ctg[grep("ERCC", gene_biotype)] <- "ERCC"
+  ctg[idx %in% grep("IG", gene_biotype) & is.na(ctg)] <- "IGgene"
+  ctg[idx %in% grep("TR", gene_biotype) & is.na(ctg)] <- "TRgene"
+  ctg[is.na(ctg)] <- "ncRNA"
+  ctg
+}
+
+ctg.col <- c("PCGs" = "royalblue4",
+               "ncRNA" = "yellow2",
+               "pseudo" = "darkseagreen3",
+               "IGgene" = "firebrick1",
+               "TRgene" = "darkorange",
+               "ERCC" = "deeppink4",
+               "other" = "bisque3")
+
+# ---- edgeR ----#
+deg.cond.pval <- 0.05
+deg.cond.mean <- 20
+deg.cond.cv <- 1
+
+run.pairwise.edger <- function(cnt, smpl){
+  cnt_b <- cnt %>% select(gene_id, one_of(smpl$sequence_id))
+  cnt.mean <- cnt_b %>% select(one_of(smpl$sequence_id)) %>%
+    apply(1, mean)
+  cnt.sub <- cnt_b %>% filter(cnt.mean > 0 )
+  count <- cnt.sub %>% 
+    column_to_rownames("gene_id") 
+  dobj <- DGEList(counts = count, group = smpl$condition, genes = rownames(count))
+  dobj <- calcNormFactors(dobj)
+  mod  <- model.matrix(~ smpl$condition)
+  dobj <- estimateDisp(dobj, mod)
+  fit <- glmFit(dobj, mod)
+  lrt <- glmLRT(fit, coef = 2)
+  tag <- topTags(lrt, n = nrow(count))$table %>%
+    filter(PValue < deg.cond.pval) 
+  list(tags = tag, lrt = lrt)
+}
+
+# ---- reading file ---- #
+root <- "/Users/wagatsuma/Box/Personal/matsunaga"
+fsmpl <- paste0(root, "/sample.txt")
+ftpm <- paste0(root, "/summary/tpm_matrix.txt")
+fcnt <- paste0(root, "/summary/count_matrix.txt")
+
+smpl <- read.table(fsmpl, header = T, stringsAsFactors = F, sep = "\t")
+tpm <- read.table(ftpm, header = T, stringsAsFactors = F, sep = "\t")
+cnt <- read.table(fcnt, header = T, stringsAsFactors = F, sep = "\t")
+
+n_smpl <- smpl %>%
+  filter(type == "Nuclei") %>%
+  filter(tissue == "cerebellum")
+cer_smpl <- smpl %>%
+  filter(tissue == "cerebellum")
+
+gene <- tpm %>% 
+    select(gene_id, chrom, gene_name, gene_biotype) %>% 
+    mutate(category = factor(to.large_category(gene_biotype),
+                             levels = rev(names(ctg.col))))
+
+print(gene)
+#---- definition of function ----#
+
+add.condition <- function(dat){
+  dat %>% mutate(condition = paste(type, tissue, PPP, pcr_cycle))
+}
+
+i <- 0
+
+```
+
+### `r i <- i + 1 ; i`. PCA clustering 
+* clustering for gene expression level(TPM)  
+* figure shows the result of PCA analysis
+```{r fig.align = "center"}
+
+
+pre_tpm <- tpm %>%
+  select(one_of(smpl$sequence_id)) %>%
+  as.matrix() 
+log.tpm <- t(log10(pre_tpm + 1))
+
+
+eb.pca <- prcomp(log.tpm, scale = F)
+df.pca <- smpl %>%
+  cbind(eb.pca$x[,1:3]) 
+
+g <- ggplot(df.pca, aes(x=PC1, y=PC2, colour = type, shape = tissue))
+g <- g + gg.basic.theme()
+g <- g + geom_point()
+print(g)
+
+```
+
+
+### `r i <- i + 1 ; i`. PCA clustering (only for nuclei of 小脳)
+* clustering for gene expression level(TPM)  
+* figure shows the result of PCA analysis
+```{r fig.align = "center"}
+
+
+pre_tpm <- tpm %>%
+  select(one_of(n_smpl$sequence_id)) %>%
+  as.matrix() 
+log.tpm <- t(log10(pre_tpm + 1))
+
+
+eb.pca <- prcomp(log.tpm, scale = F)
+
+df.pca <- n_smpl %>%
+  cbind(eb.pca$x[,1:3]) 
+
+g <- ggplot(df.pca, aes(x=PC1, y=PC2, label=sequence_id))
+g <- g + gg.basic.theme()
+g <- g + geom_point()
+g <- g + geom_text_repel(segment.size = 0.1)
+print(g)
+
+```
+
+
+### `r i <- i + 1; i`. differeneces of expression level in 3genes
+
+* Gfap
+* comparing in cluster group
+**tumor yes = tumor cells / effective**  
+**tumor no = tumor cells / not effective**
+```{r fig.align = "center"}
+
+target_tpm <- tpm %>% 
+  filter(gene_name=="Gfap" | gene_name=="Pax6" | gene_name=="Itpr1") %>%
+  select(one_of(cer_smpl$sequence_id)) %>%
+  as.matrix()
+
+bar.tar.tpm <- t(target_tpm) %>%
+  as.data.frame()
+colnames(bar.tar.tpm) <- c("Gfap", "Pax6", "Itpr1")
+bar.tpm <- cer_smpl %>%
+  cbind(bar.tar.tpm) %>%
+  select(-ercc_dil, - tissue, -PPP, -pcr_cycle) %>%
+  gather(gene, value, -type, -sequence_id)
+g <- ggplot(bar.tpm, aes(x=sequence_id, y=value, fill=type))
+g <- g + geom_bar(stat = "identity", position = "dodge")
+g <- g + labs(x="sequence_id", y="TPM", fill="type")
+g <- g + gg.basic.theme()
+g <- g + facet_grid(gene~type, scales = "free", space = "free_x")
+g <- g + theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.2),
+               strip.text = element_text(colour = "white", angle = 0))
+print(g)
+
+```
+
+
+
+### `r i <- i + 1 ; i`. PCA clustering (only for nuclei of 小脳)
+* clustering the number of PCGs > 2500
+* clustering for gene expression level(TPM)  
+* figure shows the result of PCA analysis
+
+```{r fig.align = "center"}
+th <- 0
+sequence_id <- n_smpl$sequence_id 
+
+res <- tpm %>% 
+  select(-chrom, -gene_name, -gene_biotype) %>%
+  select(gene_id, one_of(sequence_id)) %>%
+  gather(sequence_id, value, -gene_id) %>%
+  filter(value > th) %>%
+  left_join(gene, by = "gene_id") %>% 
+  group_by(sequence_id, category) %>% 
+  summarise(detected = length(value)) %>%
+  filter(category == "PCGs") %>%
+  filter(detected > 2300) %>%
+  left_join(n_smpl, by = "sequence_id") %>%
+  as.data.frame()
+
+pre_tpm <- tpm %>%
+  select(one_of(res$sequence_id)) %>%
+  as.matrix() 
+
+log.tpm <- t(log10(pre_tpm + 1))
+
+eb.pca <- prcomp(log.tpm, scale = F) 
+pca <- eb.pca$x[,1:3] %>% as.data.frame
+print(pca)
+print(res)
+df.pca <- res %>% 
+  select(sequence_id, detected) %>%
+  cbind(eb.pca$x[,1:3]) %>%
+  as.data.frame()
+
+
+print(df.pca)
+g <- ggplot(df.pca, aes(x=PC1, y=PC2, label=sequence_id))
+g <- g + gg.basic.theme()
+g <- g + geom_point()
+g <- g + geom_text_repel(segment.size = 0.1)
+print(g)
+
+```
+
+
+
+
+### `r i <- i + 1 ; i`. PCA clustering 
+* clustering for gene expression level(TPM)  
+* figure shows the result of PCA analysis
+```{r fig.align = "center"}
+pre_tpm <- tpm %>%
+  select(one_of(smpl$sequence_id)) %>%
+  as.matrix() 
+log.tpm <- t(log10(pre_tpm + 1))
+
+ssmpl <- smpl %>%
+  add.condition()
+
+rd=dist(log.tpm)
+rc=hclust(d=rd,method="ward.D2")
+
+rc$labels <- ssmpl$condition
+plot(rc)
+
+alb_tpm <- tpm %>%
+  filter(gene_name == "alb") %>%
+  select(one_of(smpl$sequence_id)) %>%
+  as.matrix()
+
+bar.tar.tpm <- t(alb_tpm) %>%
+  as.data.frame()
+
+bar.tpm <- smpl %>%
+  cbind(bar.tar.tpm) %>%
+  select(-ercc_dil, - tissue, -PPP, -pcr_cycle) %>%
+  gather(gene, value, -type, -sequence_id)
+
+g <- ggplot(bar.tpm, aes(x=sequence_id, y=value, fill=type))
+g <- g + geom_bar(stat = "identity", position = "dodge")
+g <- g + labs(x="sequence_id", y="TPM", fill="type")
+g <- g + gg.basic.theme()
+g <- g + facet_grid(gene~type, scales = "free", space = "free_x")
+g <- g + theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.2),
+               strip.text = element_text(colour = "white", angle = 0))
+print(g)
+
+
+```
+
+
+### `r i <- i + 1 ; i`. PCA clustering (only for nuclei of 小脳)
+* clustering the number of PCGs > 2500
+* clustering for gene expression level(TPM)  
+* figure shows the result of PCA analysis
+
+```{r fig.align = "center"}
+th <- 0
+sequence_id <- n_smpl$sequence_id 
+print(gene)
+res <- tpm %>% 
+  select(-chrom, -gene_name, -gene_biotype) %>%
+  select(gene_id, one_of(sequence_id)) %>%
+  left_join(gene, by = "gene_id") %>% 
+  mutate(category = to.large_category(gene_biotype)) %>% 
+  mutate(category = factor(category, levels = rev(ctgs.fact))) %>% 
+  select(-gene_id, -chrom, -gene_name, -gene_biotype) %>% 
+  gather(sequence_id, value, -category) %>% 
+  left_join(n_smpl, by = "sequence_id") %>% 
+  group_by(sequence_id, category) %>% 
+  summarise(value = sum(value)) %>% 
+  as.data.frame() %>% 
+  left_join(n_smpl, by = "sequence_id") %>% 
+  sort.sample() %>% 
+  filter(category == "ERCC") %>%
+  filter(value < 200000) %>%
+  as.data.frame()
+
+pre_tpm <- tpm %>%
+  select(one_of(res$sequence_id)) %>%
+  as.matrix() 
+
+log.tpm <- t(log10(pre_tpm + 1))
+
+eb.pca <- prcomp(log.tpm, scale = F) 
+
+df.pca <- res %>% 
+  select(sequence_id, value) %>%
+  cbind(eb.pca$x[,1:3]) %>%
+  as.data.frame()
+
+
+print(df.pca)
+g <- ggplot(df.pca, aes(x=PC1, y=PC2, label=sequence_id))
+g <- g + gg.basic.theme()
+g <- g + geom_point()
+g <- g + geom_text_repel(segment.size = 0.1)
+print(g)
+```
+
+
+
