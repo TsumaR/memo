@@ -11,5 +11,9 @@ $ wget tbb.bio.uu.nl/bastiaan/CAT_prepare/CAT_prepare_20190719.tar.gz
 
 $ tar -xvzf CAT_prepare_20190719.tar.gz
  ```  
+89GBもあったため，ダウンロードするだけのジョブが1日かかってしまった。もっと早くやる方法はあるか。また，せっかくなのでこのデータベースを東大スパコンのshareディレクトリに入れたい。許可をとって今後行う予定。  
+また，DIAMONDデータベースの構築とあるが，CATはDIAMONDベースのアルゴリズム？だとしたらBenchmarking Metagenomics Tools for Taxonomic Classification(2019 Cell)の論文的にあまり精度が高くなさそうだが。  
+正確に論文を読む必要がある。  
+
 ### 実行  
 * megahitでアセンブリしたcontigに対してアノテーション付けを行う。
