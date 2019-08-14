@@ -21,4 +21,10 @@ DiamondデータベースはCATのアルゴリズムで重要となるORF探索�
 実際にアルゴリズムとしてDiamondで分類分けした時との違いが論文中に触れられており，CATの方が精度が高かった。  
 
 ## 実行  
-* megahitでアセンブリしたcontigに対してアノテーション付けを行う。
+* megahitでアセンブリしたcontigに対してアノテーション付けを行う。  
+```$ CAT contigs -c $contig_fasta -d $database_dir -t $taxonomy_dir -o $out_dir```  
+-dと-tで先ほど作成したデータベースとtaxonomyを指定し，-cでcontigを指定する。  
+今回は指定していないためパラメタ(r,f)はデフォルトで行なっている。  
+
+* 
+
