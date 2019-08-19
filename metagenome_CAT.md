@@ -32,11 +32,9 @@ terminate called after throwing an instance of ‘File_write_exception'
 ```    
 というエラーで止まってしまった。一時ファイル保存ディレクトリでディスク量超過の模様。
 スパコンQ&Aに，diamondでの同様のエラーに対して--tmpdirでホームディスクを指定することを進めていたが，/yshare1/homeなどは全てpermission deniedで拒否されてしまった。一度ディレクトリを作成してからファイルを出力するため？  
-```'--block_size'：help='DIAMOND block-size parameter (default: 2.0). '
-                        'Lower numbers will decrease memory and '
-                        'temporary disk space usage.') 
+```--block_size：(help=DIAMOND block-size parameter (default: 2.0). Lower numbers will decrease memory and temporary disk space usage.) 
 ```
-optionを0.5にし，一時ディスク使用量を下げていく方針でやることとする。  
+このoptionを0.5にし，一時ディスク使用量を下げていく方針でやることとする。  
                                
 * 
 
