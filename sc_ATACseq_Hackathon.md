@@ -53,6 +53,15 @@ Seuratからダウンロードできるデータは`atac_v1_pbmc_10k_filtered_pe
   `pbmc_10k_v3_filtered_feature_bc_matrix.h5`の３つ。この3つ以外の必要なデータは[!10X Genomicsの公式ページ](https://support.10xgenomics.com/single-cell-atac/datasets/1.1.0/atac_v1_pbmc_10k)よりダウンロードする必要がある。  
   今回は，10k Peripheral blood mononuclear cells (PBMCs) from a healthy donor "Single Cell ATAC Dataset by Cell Ranger ATAC 1.1.0"のデータセットを用いた。Seuratのものと完全に一致しているかは確認していない。
 
+##### SnapATAÇの原理  
+SnapATACの簡単なワークフローは以下の通り  
+[![SnapATACのワークフロー](https://www.biorxiv.org/content/biorxiv/early/2019/05/13/615179/F1.large.jpg?width=800&height=600&carousel=1)  
+（a）前処理：SnapATACは、入力として生のシーケンシングリードを取得し、それらを参照ゲノムに合わせて低品質の細胞をろ過します。 （b）セルごとのバイナリマトリックス：ゲノムは均一サイズのビンにセグメント化され、単一セルプロファイルはバイナリマトリックスとして表されます。「1」は特定のビンが特定のビンにアクセスできることを示し、「0」はアクセスできないことを示します。クロマチンまたは欠損データ。 （c）特徴選択とJaccardインデックスマトリックス：望ましくないビンをフィルタリングした後、プロファイルの重複に基づいてセル間の類似性を推定することにより、ゲノム全体のセルごとのマトリックスをJaccardインデックスマトリックスに変換します。  
+（d）正規化：Jaccard類似性マトリックスは、回帰に基づいた方法を使用して正規化され、読み取り深度の影響が排除されます。 （e）クラスタリング：正規化されたマトリックスを使用して、同様のアクセシビリティプロファイルのセルがクラスター化され、t-SNE（t-Distributed Stochastic Neighbor Embedding）またはUMAP（Uniform Manifold近似と次元削減のための投影）を使用して視覚化されます。 
+（f）ピーク呼び出し：同じクラスターに属する細胞を集約して、de novoのcis調節要素候補の同定のための細胞タイプ固有の調節ランドスケープの表現を作成します。 （g）ピーク発生頻度マトリックス：各クラスターで発生するピークの頻度（合​​計のうちのセル数）が計算されます。 
+（h）微分分析：細胞タイプに特有の調節要素を識別するために実行される微分分析。
+（i）GREAT＆Motif分析：各クラスターの潜在的な機能を予測するために実行されるGREAT（Genomic Region Enrichment Tool of Annotation Tool）分析と、各細胞の遺伝子発現を制御する候補マスターレギュレーターを明らかにするためのモチーフ分析タイプ。
+
 ##### Step 1. Create snap file.  
 ```
 $ ~/packages/fetchChromSizes.sh hg38 > hg38.chrom.size
