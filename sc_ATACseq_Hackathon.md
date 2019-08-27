@@ -67,6 +67,33 @@ SnapATACの簡単なワークフローは以下の通り
 $ ~/packages/fetchChromSizes.sh hg38 > hg38.chrom.size
 $ #chimeric列でsort
 $ sort -k4,4 data/atac_v1_pbmc_10k_singlecell.csv | gzip - > data/atac_v1_pbmc_10k_singlecell.srt.bed.gz
+$snaptools snap-pre \
+  --input-file=$input_file \
+  --output-snap=$output_file \
+  --genome-name=mm10 \
+  --genome-size=$genome_size \
+  --min-mapq=30 \
+  --min-flen=50 \
+  --max-flen=1000 \
+  --keep-chrm=TRUE \
+  --keep-single=FALSE \
+  --keep-secondary=False \
+  --overwrite=True \
+  --max-num=20000 \
+  --min-cov=0 \
+  --verbose=True
+ $cat $output_file
+ Total number of unique barcodes:             20000
+TN - Total number of fragments:              141852815
+UM - Total number of uniquely mapped:        141852815
+SE - Total number of single ends:            0
+SA - Total number of secondary alignments:   0
+PE - Total number of paired ends:            141852815
+PP - Total number of proper paired:          141852815
+PL - Total number of proper frag len:        124056011
+US - Total number of usable fragments:       124056011
+UQ - Total number of unique fragments:       124056011
+CM - Total number of chrM fragments:         0
 ```
 `fetchChromSizes`がない場合，`conda install ucsc-fetchchromsizes`でダウンロードして権限を与えて使用する。
 
