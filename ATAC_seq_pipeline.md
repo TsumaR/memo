@@ -1,21 +1,21 @@
-### ATAC-seq pipelineの作成
-とりあえず，今回はバルクのようなデータしか取れないので
+# ATAC-seq pipelineの作成
+とりあえず，今回はバルクのようなデータしか取れないのでピークコールし，アノテーション付するところまで行なった。
 
-#### リファレンスの準備
+### リファレンスの準備
 リファレンス配列は通常，ensebmleかUCSCのゲノムブラウザーからダウンロードする。今回はFASTAファイルをUCSC genome browserから，gtfファイルをensembleから持ってきた。gtfファイルはensembleの方が情報量が多いので詳細解析をする時はgtfの方が良いらしい。　
 注意しないといけないのが，ensembleのgene idは単なる数字なのに対してUCSCではchr1のように異なる。それを揃えるためensembleから持ってきたgtfファイルの先頭にchrを加えていく。
 ```
 grep -v \# Homo_sapiens.GRCh38.98.gtf | awk '{print "chr" $0 }' > Homo_sapiens.GRCh38.98.addchr.gtf
 ```
 
-#### 仮想環境の準備
+### 仮想環境の準備
 `conda create -n atac_seq python3.7.1 numpy`
 でatac_seq用の仮想環境を作成　
 `conda install -c bioconda macs2`
 で必要なmacs2をインストールしておく。　
 
 # 手順
-#### クリーニング　
+### クリーニング　
 `trimmomatic`を利用してアダプター配列や末端の配列を除去する。　
 ```
 java -jar $trimmomatic \
@@ -32,10 +32,16 @@ java -jar $trimmomatic \
     MINLEN:36
 ```
 
-#### qc
-`fastq`を利用してqcファイルの作成。この際，`trimmomatic`を利用してクリーニングした後の配列と，していない配列両方に対してqcreportを作成。その結果を`../result/qcreport`ディレクトリに保存している。後から`multiqc`を用いて１つのqc結果として出力する。　
+### qc
+`fastq`を利用してqcファイルの作成。この際，`trimmomatic`を利用してクリーニングした後の配列と，していない配列両方に対してqcreportを作成。その結果を`../result/qcreport`ディレクトリに保存している。　
+パイプラインと別に後から，`../result/qcreport`ディレクトリで，
+```
+multiqc .
+```
+を用いて１つのqcレポートにまとめる。 ~~その予定だが，`networkx`パッケージを見つけることができないというエラーを吐かれて実行できない。環境が壊れてしまっているのか，改めて入れ直して実行してもうまくいかない。~~　
+仕方なく，`pip install networkx`したらうまくいった。
 
-#### mapping
+### mapping
 `STAR`を用いてmappingする。 この際`STAR`は最低32GBのメモリを確保しておくことが推奨されているそうなのでそこに気をつける。
 ```
 $STAR --runThredN $cpu \
@@ -45,7 +51,40 @@ $STAR --runThredN $cpu \
     --outFileNamePrefix ${id}.
 ```
 
-#### 重複している配列の除去
+### 重複している配列の除去
 ピークコールする前に`picard`を用いて重複配列の除去を行う。　
+```
+java -jar $picard MarkDuplicates \
+    I=${id}.bamAligned.sortedByCoord.out.bam \
+    M=${id}_dupl.bam \
+    O=$cln_bam
+```
 
-#### ピークコール　
+### ピークコール　
+`macs2`を用いてピークコールする。
+```
+macs2 callpeak \
+    -t $cln_bam \
+    -n $id \
+    -f BAMPE \
+    -g $species \
+    --nomodel \
+    --nolambda \
+    --keep-dup all \
+    --call-summits
+```
+
+### ピークマージと比較
+得られたピークをマージする。
+```
+cat a.bed b.bed c.bed | sort -k1,1 -k2,2n | bedtools merge -i - > merged.bed
+```
+マージしたピークとリファレンスゲノムの比較を行うため，重複を調べる。この際，-fパラメータを指定しないので1塩基でも重複していたら重複とした。
+```
+bedtools intersect -a merged.bed -b ../../../omni_atac/SRR5427886/SRR5427886_peaks.narrowPeak -sorted > intersect_omni.bed
+```
+この結果を`unique -u intersect_omni.bed | wc -l `で確認したところ，`1105`
+一方で，今回の実験で得られたシーケンス結果をマージした際のピーク数は，`uniq -u merged.bed | wc -l`で，`6847`だった。
+
+### ピークのアノテーション付け
+MACS2によって得られたピークにアノテーション付けを行い，TSS付近にどれだけピークが集中しているかを調べる。

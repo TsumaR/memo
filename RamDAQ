@@ -1,0 +1,38 @@
+## RamDaQを試す
+### 1. Installing Nextflow
+```
+mkdir -p ~/bin
+cd ~/bin
+wget -qO- https://get.nextflow.io | bash
+```
+をしたところ以下のエラーが発生した。
+```
+Picked up JAVA_TOOL_OPTIONS: -XX:+UseSerialGC -Xmx64m -Xms32m
+CAPSULE EXCEPTION: Could not parse version line: Picked up JAVA_TOOL_OPTIONS: -XX:+UseSerialGC -Xmx64m -Xms32m (for stack trace, run with -Dcapsule.log=verbose)
+USAGE: java <options> -jar ../.nextflow/framework/19.10.0/nextflow-19.10.0-one.jar
+
+Actions:
+  capsule.version - Prints the capsule and application versions.
+  capsule.modes - Prints all available capsule modes.
+  capsule.jvms - Prints a list of all JVM installations found.
+  capsule.help - Prints this help message.
+  capsule.tree - Prints the capsule's dependency tree.
+  capsule.resolve - Downloads all un-cached dependencies.
+
+Options:
+  capsule.mode=<value> - Picks the capsule mode to run.
+  capsule.reset - Resets the capsule cache before launching. The capsule to be re-extracted (if applicable), and other possibly cached files will be recreated.
+  capsule.log=<value> (default: quiet) - Picks a log level. Must be one of none, quiet, verbose, or debug.
+  capsule.java.home=<value> - Sets the location of the Java home (JVM installation directory) to use; If 'current' forces the use of the JVM that launched the capsule.
+  capsule.java.cmd=<value> - Sets the path to the Java executable to use.
+  capsule.jvm.args=<value> - Sets additional JVM arguments to use when running the application.
+  capsule.local=<value> - Sets the path of the local Maven repository to use.
+Unable to initialize nextflow environment
+```
+
+環境を初期化できないと言われ，インストールができなかった。そこで，binディレクトリ内で
+```
+java -jar ../.nextflow/framework/19.10.0/nextflow-19.10.0-one.jar
+```
+を実行。それでもうまくいかない，，
+Githubのリードミーでanacondaでも利用できるとあったので，anaconda環境で実行することに変更。　
