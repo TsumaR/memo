@@ -32,6 +32,7 @@ java -jar $trimmomatic \
     MINLEN:36
 ```
 
+
 ### qc
 `fastq`を利用してqcファイルの作成。この際，`trimmomatic`を利用してクリーニングした後の配列と，していない配列両方に対してqcreportを作成。その結果を`../result/qcreport`ディレクトリに保存している。　
 パイプラインと別に後から，`../result/qcreport`ディレクトリで，
@@ -51,13 +52,21 @@ $STAR --runThredN $cpu \
     --outFileNamePrefix ${id}.
 ```
 
-### 重複している配列の除去
-ピークコールする前に`picard`を用いて重複配列の除去を行う。　
+### 重複している配列の除去，ミトコンドリア配列の除去
+ピークコールする前に`picard`を用いて重複配列の除去を行う。MultiQCによるQCレポートを見るとわかるが，今回はduplicateが異常に多かった(約95%)，そのため，この操作の際にファイル容量が大幅に減少した。 　
 ```
 java -jar $picard MarkDuplicates \
     I=${id}.bamAligned.sortedByCoord.out.bam \
     M=${id}_dupl.bam \
     O=$cln_bam
+```　
+さらに，ミトコンドリアとY染色体にあったっているリードを除去する。ただし，今回はミトコンドリアに当たっているリードは0だった。　
+`samtools`を用いてそれらのクリーニングを行なった後に，のちの解析のため，sortとindex作成を行なっておく。
+```
+$samtools view -h -F4 $ddup_bam | grep -v chrM | $samtools view -b > $MT_bam
+$samtools view -h -F4 $MT_bam | grep -v chrY | $samtools view -b > $cln_bam
+$samtools sort -o $cln_bam $cln_bam
+$samtools index $cln_bam  
 ```
 
 ### ピークコール　
@@ -87,4 +96,9 @@ bedtools intersect -a merged.bed -b ../../../omni_atac/SRR5427886/SRR5427886_pea
 一方で，今回の実験で得られたシーケンス結果をマージした際のピーク数は，`uniq -u merged.bed | wc -l`で，`6847`だった。
 
 ### ピークのアノテーション付け
-MACS2によって得られたピークにアノテーション付けを行い，TSS付近にどれだけピークが集中しているかを調べる。
+HOMERの`annotatePeaks.pl`を用いて，MACS2によって得られたピークにアノテーション付けを行う。
+```
+$annotate ${id}_peaks.narrowPeak hg38 > $an_peak
+# $annotate tss hg38 -size 500 -hist 1 -p ${id}_peaks.narrowPeak > $an_peak
+```
+間違っている気もするので，中身の確認をしっかりと行う必要がある。
