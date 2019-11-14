@@ -95,6 +95,8 @@ bedtools intersect -a merged.bed -b ../../../omni_atac/SRR5427886/SRR5427886_pea
 この結果を`unique -u intersect_omni.bed | wc -l `で確認したところ，`1105`
 一方で，今回の実験で得られたシーケンス結果をマージした際のピーク数は，`uniq -u merged.bed | wc -l`で，`6847`だった。
 
+bedtools intersect -wa -a omni_atac/SRR5427886/SRR5427886_peaks.narrowPeak -b 191101_atac5/merged_atac5.bed > atac5_intersect.bed
+
 ### ピークのアノテーション付け
 HOMERの`annotatePeaks.pl`を用いて，MACS2によって得られたピークにアノテーション付けを行う。
 ```
@@ -104,3 +106,6 @@ $annotate ${id}_peaks.narrowPeak hg38 > $an_peak
 
 ### R，pythonでの解析
 以上の操作によって得られたファイル，マージのピークファイル，アノテーションファイル(今回はマージしていないもの)，
+
+
+uniq -u atac5_intersect.bed | wc -l
