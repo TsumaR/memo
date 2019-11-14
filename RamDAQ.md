@@ -67,8 +67,26 @@ container "docker.io/myoshimura080822/fastqmcf:1.0"を
 container "index.docker.io/myoshimura080822/fastqmcf:1.0"に書き換え
 
 動いた
+今度はファイル見つからないと言われる。
+```
+Command executed:
 
-今度はファイル見つからないって言われるからprocess run_fastQC {の
+  fastqc -o . --nogroup /yshare1/home/myne812/test/ramda_test_1st/output_ramda_test/FASTQ/c2-x0-5-P_S19_L001_R1_001.fastq.gz && unzip c2-x0-5-P_R1_trim_fastqc.zip
+  fastqc -o . --nogroup /yshare1/home/myne812/test/ramda_test_1st/output_ramda_test/FASTQ/c2-x0-5-P_S19_L001_R2_001.fastq.gz && unzip c2-x0-5-P_R2_trim_fastqc.zip
+```
+そこで，
+```
+script:
+    """
+    fastqc -o . --nogroup $fastq_L && unzip ${fastq_L_name}_trim_fastqc.zip
+    fastqc -o . --nogroup $fastq_R && unzip ${fastq_R_name}_trim_fastqc.zip
+    """
+```
+でダブルクオテーションを3つの"""から""の2つに変更した。エラーは発生しなくなったが，そもそもコマンドが動いていない可能性もある。
+
+下流において，
+
+からprocess run_fastQC {の
 && unzip ${fastq_R_name}_trim_fastqc.zip
 を消去してみた。
 fastqc -o . --nogroup path だけになってもno such fileになってしまった。
