@@ -99,6 +99,8 @@ bedtools intersect -a merged.bed -b ../../../omni_atac/SRR5427886/SRR5427886_pea
 HOMERの`annotatePeaks.pl`を用いて，MACS2によって得られたピークにアノテーション付けを行う。
 ```
 $annotate ${id}_peaks.narrowPeak hg38 > $an_peak
-# $annotate tss hg38 -size 500 -hist 1 -p ${id}_peaks.narrowPeak > $an_peak
 ```
 間違っている気もするので，中身の確認をしっかりと行う必要がある。
+
+### R，pythonでの解析
+以上の操作によって得られたファイル，マージのピークファイル，アノテーションファイル(今回はマージしていないもの)，
