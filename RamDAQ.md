@@ -61,13 +61,15 @@ Caused by:
     ERROR: pulling container failed!
 ```
 認証エラー。docker.ioからpullするときにエラーが発生していることがわかる。アカウントを指定してあげないといけないっぽい。　
+```
 https://github.com/sylabs/singularity/issues/1386
-qc_pe/02_ramdaQC_PE_fastqmcf_fastQC.nfファイルの，
-container "docker.io/myoshimura080822/fastqmcf:1.0"を
-container "index.docker.io/myoshimura080822/fastqmcf:1.0"に書き換え
+```  
+`qc_pe/02_ramdaQC_PE_fastqmcf_fastQC.nf` ファイルの，
+`container "docker.io/myoshimura080822/fastqmcf:1.0"` を
+`container "index.docker.io/myoshimura080822/fastqmcf:1.0"` に書き換え
 
 動いた
-今度はファイル見つからないと言われる。
+今度はファイル見つからないと以下のエラーで言われる。
 ```
 Command executed:
 
