@@ -55,15 +55,16 @@ $STAR --runThredN $cpu \
 ### 重複している配列の除去，ミトコンドリア配列の除去
 ピークコールする前に`picard`を用いて重複配列の除去を行う。MultiQCによるQCレポートを見るとわかるが，今回はduplicateが異常に多かった(約95%)，そのため，この操作の際にファイル容量が大幅に減少した。 　
 
-``` 
+```
 java -jar $picard MarkDuplicates \
     I=${id}.bamAligned.sortedByCoord.out.bam \
     M=${id}_dupl.bam \
     O=$cln_bam
-```　
+```
 
 さらに，ミトコンドリアとY染色体にあったっているリードを除去する。ただし，今回はミトコンドリアに当たっているリードは0だった。　
 `samtools`を用いてそれらのクリーニングを行なった後に，のちの解析のため，sortとindex作成を行なっておく。
+ 
 ```
 $samtools view -h -F4 $ddup_bam | grep -v chrM | $samtools view -b > $MT_bam
 $samtools view -h -F4 $MT_bam | grep -v chrY | $samtools view -b > $cln_bam
