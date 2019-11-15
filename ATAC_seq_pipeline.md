@@ -54,12 +54,14 @@ $STAR --runThredN $cpu \
 
 ### 重複している配列の除去，ミトコンドリア配列の除去
 ピークコールする前に`picard`を用いて重複配列の除去を行う。MultiQCによるQCレポートを見るとわかるが，今回はduplicateが異常に多かった(約95%)，そのため，この操作の際にファイル容量が大幅に減少した。 　
-```
+
+``` 
 java -jar $picard MarkDuplicates \
     I=${id}.bamAligned.sortedByCoord.out.bam \
     M=${id}_dupl.bam \
     O=$cln_bam
 ```　
+
 さらに，ミトコンドリアとY染色体にあったっているリードを除去する。ただし，今回はミトコンドリアに当たっているリードは0だった。　
 `samtools`を用いてそれらのクリーニングを行なった後に，のちの解析のため，sortとindex作成を行なっておく。
 ```
@@ -100,8 +102,19 @@ cat a.bed b.bed c.bed | bedtools merge -i - > merged.bed
 ![bedtools insert](https://github.com/TsumaR/memo/blob/master/figure/intersect-glyph.png)
 
 ```
-bedtools intersect -a merged.bed -b ../../../omni_atac/SRR5427886/SRR5427886_peaks.narrowPeak -sorted > intersect_omni.bed
+bedtools intersect -wa -a ../omni_atac/SRR5427886/SRR5427886_peaks.narrowPeak -b merged_atac5.bed > atac5_intersect.bed
 ```
+```
+wc -l SRR5427886_peaks.narrowPeak
+```
+でOmni-ATACのピーク数を確認すると79297だった。
+一方で，
+```
+wc -l merged.bed
+```
+では，927しかピークが検出されなかった。
+
+
 この結果を`unique -u intersect_omni.bed | wc -l `で確認したところ，`1105`
 一方で，今回の実験で得られたシーケンス結果をマージした際のピーク数は，`uniq -u merged.bed | wc -l`で，`6847`だった。
 
@@ -112,3 +125,4 @@ bedtools intersect -wa -a omni_atac/SRR5427886/SRR5427886_peaks.narrowPeak -b 19
 
 
 uniq -u atac5_intersect.bed | wc -l
+4214
