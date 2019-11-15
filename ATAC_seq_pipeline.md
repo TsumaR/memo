@@ -83,12 +83,22 @@ macs2 callpeak \
     --call-summits
 ```
 
+### ピークのアノテーション付け
+HOMERの`annotatePeaks.pl`を用いて，MACS2によって得られたピークにアノテーション付けを行う。
+```
+$annotate ${id}_peaks.narrowPeak hg38 > $an_peak
+```
+間違っている気もするので，中身の確認をしっかりと行う必要がある。
+
 ### ピークマージと比較
 得られたピークをマージする。
 ```
-cat a.bed b.bed c.bed | sort -k1,1 -k2,2n | bedtools merge -i - > merged.bed
+cat a.bed b.bed c.bed | bedtools merge -i - > merged.bed
 ```
 マージしたピークとリファレンスゲノムの比較を行うため，重複を調べる。この際，-fパラメータを指定しないので1塩基でも重複していたら重複とした。
+`bedtools insert`で重複を確認する。どのように行なっているかは下図参照。  
+![bedtools insert](https://github.com/TsumaR/memo/blob/master/figure/intersect-glyph.png)
+
 ```
 bedtools intersect -a merged.bed -b ../../../omni_atac/SRR5427886/SRR5427886_peaks.narrowPeak -sorted > intersect_omni.bed
 ```
@@ -96,13 +106,6 @@ bedtools intersect -a merged.bed -b ../../../omni_atac/SRR5427886/SRR5427886_pea
 一方で，今回の実験で得られたシーケンス結果をマージした際のピーク数は，`uniq -u merged.bed | wc -l`で，`6847`だった。
 
 bedtools intersect -wa -a omni_atac/SRR5427886/SRR5427886_peaks.narrowPeak -b 191101_atac5/merged_atac5.bed > atac5_intersect.bed
-
-### ピークのアノテーション付け
-HOMERの`annotatePeaks.pl`を用いて，MACS2によって得られたピークにアノテーション付けを行う。
-```
-$annotate ${id}_peaks.narrowPeak hg38 > $an_peak
-```
-間違っている気もするので，中身の確認をしっかりと行う必要がある。
 
 ### R，pythonでの解析
 以上の操作によって得られたファイル，マージのピークファイル，アノテーションファイル(今回はマージしていないもの)，
