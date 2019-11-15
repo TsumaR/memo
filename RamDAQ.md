@@ -92,3 +92,5 @@ script:
 && unzip ${fastq_R_name}_trim_fastqc.zip
 を消去してみた。
 fastqc -o . --nogroup path だけになってもno such fileになってしまった。
+
+うまく行かない。。。
