@@ -64,7 +64,7 @@ java -jar $picard MarkDuplicates \
 
 さらに，ミトコンドリアとY染色体にあったっているリードを除去する。ただし，今回はミトコンドリアに当たっているリードは0だった。　
 `samtools`を用いてそれらのクリーニングを行なった後に，のちの解析のため，sortとindex作成を行なっておく。
- 
+
 ```
 $samtools view -h -F4 $ddup_bam | grep -v chrM | $samtools view -b > $MT_bam
 $samtools view -h -F4 $MT_bam | grep -v chrY | $samtools view -b > $cln_bam
@@ -115,9 +115,8 @@ wc -l merged.bed
 ```
 では，927しかピークが検出されなかった。
 
+この結果を`uniq -u intersect_omni.bed | wc -l `で確認したところ，95のみ，
 
-この結果を`unique -u intersect_omni.bed | wc -l `で確認したところ，`1105`
-一方で，今回の実験で得られたシーケンス結果をマージした際のピーク数は，`uniq -u merged.bed | wc -l`で，`6847`だった。
 
 bedtools intersect -wa -a omni_atac/SRR5427886/SRR5427886_peaks.narrowPeak -b 191101_atac5/merged_atac5.bed > atac5_intersect.bed
 
