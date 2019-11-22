@@ -96,13 +96,12 @@ macならとても簡単。[このサイト](https://dev.classmethod.jp/etc/vs-c
 以下に簡単な設定方法を記載するが，configファイルさえ作成してあれば1分ほどで完了する。windowsでも簡単にできる模様。
 
 VScodeの拡張機能である，`Remote Development`をインストールする。これで必要な拡張機能が全てインストールされる。
-![install](https://cdn-ssl-devio-img.classmethod.jp/wp-content/uploads/2019/05/030-min2-960x631.png) 
+<img src="https://cdn-ssl-devio-img.classmethod.jp/wp-content/uploads/2019/05/030-min2-960x631.png" width="40%">
 
 すると左のツールバーにRemote-SSHアイコンが現れる
-![アイコン](https://cdn-ssl-devio-img.classmethod.jp/wp-content/uploads/2019/05/040-min2.png) 
-
 アイコンをクリックすると，configファイルに設定された接続先の一覧が表示される。
-![アドレス](https://cdn-ssl-devio-img.classmethod.jp/wp-content/uploads/2019/05/040-min2.png)
+<img src="https://cdn-ssl-devio-img.classmethod.jp/wp-content/uploads/2019/05/040-min2.png" width="40%">
+
 
 接続したいリモート先をクリックするとssh接続される。あとはディレクトリをローカル環境のように移動し，様々なファイルを編集することができる。VScodeの拡張機能を利用することもできるので大変便利である。 
 ドラッグ&ドロップなどでファイルを追加することができないのなどは残念なところ。
