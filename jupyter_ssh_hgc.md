@@ -1,22 +1,22 @@
 # 東大スパコンでjupyter labとVScode
 
 ## 概要 
-Anacondaパッケージに内包されているデータ解析用のIDE。 
+Anacondaパッケージに内包されているデータ解析用のIDE。  
 ローカルサーバー上で操作させるため，そのままではssh接続しているリモートのファイルを編集することができない。 
-そこで必要となる設定を，東大スパコンに対して行なった結果を記載する。
-(追記)
-*VScodeの設定を追加した，個人的にはjupyterよりも便利だと思うので利用していきたい。*
+そこで必要となる設定を，東大スパコンに対して行なった結果を記載する。 
+(追記) 
+*VScodeの設定を追加した，個人的にはjupyterよりも便利だと思うので利用していきたい。* 
 
-詳しい説明は[井手さんのホームページ](http://133.9.8.88/~ide/analysis/others/jupyter-notebook/)にあるが，OILスパコンをメインとした説明である。
-東大スパコンへの設定で自分が手こずった部分を中心に記載する。
+詳しい説明は[井手さんのホームページ](http://133.9.8.88/~ide/analysis/others/jupyter-notebook/)にあるが，OILスパコンをメインとした説明である。 
+東大スパコンへの設定で自分が手こずった部分を中心に記載する。 
 
 
 ## 操作 
 ### スパコン上でのssh configの設定 
 まず，`vim .ssh/config`でローカルPC上のssh接続の設定ファイルを編集する。 
-ここで，通常操作する際のログインノードは`slogin.hgc.jp`である(正確にはログインノードも２つあり，それぞれに異なるIPアドレスが振られている)が，jupyer labを利用するためには，ロボットのためのログインノードである`sutil.hgc.jp`を利用することが推奨されている。
-この点が東大スパコンで設定する際に注意する点である。 
-このログインノードではqloginした際の計算ノードと同じ環境になっている。　
+ここで，通常操作する際のログインノードは`slogin.hgc.jp`である(正確にはログインノードも２つあり，それぞれに異なるIPアドレスが振られている)が，jupyer labを利用するためには，ロボットのためのログインノードである`sutil.hgc.jp`を利用することが推奨されている。 
+この点が東大スパコンで設定する際に注意する点である。  
+このログインノードではqloginした際の計算ノードと同じ環境になっている。
 ```
 Host hgc
 HostName slogin.hgc.jp
@@ -31,13 +31,13 @@ LocalForward 8888 localhost:8888
 ``` 
 自分の場合`.ssh/config`ファイルは上記のようにしている。　
 
-### スパコン上のjupyter configファイルを設定する。
-井手さんのconfigファイルをお借りしている。
+### スパコン上のjupyter configファイルを設定する。 
+井手さんのconfigファイルをお借りしている。 
 ```
 jupyter notebook --generate-config
 vi ~/.jupyter/jupyter_notebook_config.py
 ```
-で開き，ファイルの最下部に以下を書き加える。
+で開き，ファイルの最下部に以下を書き加える。 
 ```
 c = get_config()
 
@@ -56,15 +56,15 @@ c.NotebookApp.token = '890'
 ```　
 
 ### 使ってみる 
-anaconda(もしくはjupyerに)にpathを通しているなら，編集したいファイルがあるディレクトリに移動し，下記のコマンドを入力する。
+anaconda(もしくはjupyerに)にpathを通しているなら，編集したいファイルがあるディレクトリに移動し，下記のコマンドを入力する。 
 ```　
 jupyer lab 
 ```
-その際得られるlogが以下のようになっている。jupyterのconfigファイルにおいて，
+その際得られるlogが以下のようになっている。jupyterのconfigファイルにおいて， 
 ```
 c.NotebookApp.open_browser = False
 ```
-上記のように設定している場合，自動ではブラウザが立ち上がらないので，
+上記のように設定している場合，自動ではブラウザが立ち上がらないので， 
 ```
 (base) [myne812@gc003 ~]$ jupyter lab
 [I 22:34:33.094 LabApp] JupyterLab extension loaded from /home/myne812/anaconda3/lib/python3.7/site-packages/jupyterlab
@@ -83,7 +83,7 @@ c.NotebookApp.open_browser = False
 ``` 
 pip install bash_kernel
 python -m bash_kernel.install 
-``` 
+```  
 
 
 
@@ -96,10 +96,12 @@ macならとても簡単。[このサイト](https://dev.classmethod.jp/etc/vs-c
 以下に簡単な設定方法を記載するが，configファイルさえ作成してあれば1分ほどで完了する。windowsでも簡単にできる模様。
 
 VScodeの拡張機能である，`Remote Development`をインストールする。これで必要な拡張機能が全てインストールされる。
+
 <img src="https://cdn-ssl-devio-img.classmethod.jp/wp-content/uploads/2019/05/030-min2-960x631.png" width="40%">
 
 すると左のツールバーにRemote-SSHアイコンが現れる
 アイコンをクリックすると，configファイルに設定された接続先の一覧が表示される。
+
 <img src="https://cdn-ssl-devio-img.classmethod.jp/wp-content/uploads/2019/05/040-min2.png" width="40%">
 
 
