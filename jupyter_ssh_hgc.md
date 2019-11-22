@@ -1,7 +1,7 @@
-# 東大スパコンでjupyter labとVScode
+# 東大スパコンでjupyter labとVSCode
 
 ## 概要 
-Anacondaパッケージに内包されているデータ解析用のIDE。  
+jupyter lab，jupyter notebookはAnacondaパッケージに内包されているデータ解析用のIDE。  
 ローカルサーバー上で操作させるため，そのままではssh接続しているリモートのファイルを編集することができない。 
 そこで必要となる設定を，東大スパコンに対して行なった結果を記載する。 
 (追記) 
@@ -47,7 +47,7 @@ c.IPKernelApp.pylab = 'inline'
 c.NotebookApp.ip = '0.0.0.0'
 # IPython notebookのログインパスワード
 #c.NotebookApp.password = 'sha1:f6aaa78c99d3:1229eee791191644436957a2626cf5619a1bad06'
-# 起動時にブラウザを起動させるかの設定(デフォルトは起動させる，自分はTrueにしている。)
+# 起動時にブラウザを起動させるかの設定(デフォルトは起動させる)
 c.NotebookApp.open_browser = False
 # ポート指定(デフォルトは8888)
 c.NotebookApp.port = 8888
