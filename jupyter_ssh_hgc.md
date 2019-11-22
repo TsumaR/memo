@@ -32,13 +32,13 @@ LocalForward 8888 localhost:8888
 自分の場合`.ssh/config`ファイルは上記のようにしている。　
 
 ### スパコン上のjupyter configファイルを設定する。 
-井手さんのconfigファイルをお借りしている。 
+井手さんのconfigファイルをお借りしている。下記のコマンドでjupyter configファイルを作成，編集する。 
 ```
 jupyter notebook --generate-config
 vi ~/.jupyter/jupyter_notebook_config.py
 ```
-で開き，ファイルの最下部に以下を書き加える。 
-```
+開かれたら，ファイルの最下部に以下の内容を記載する。井手さんのホームページの内容をお借りしている。 
+``` 
 c = get_config()
 
 # matplotlibで描画したものがnotebook上で表示できるようにする
@@ -53,9 +53,9 @@ c.NotebookApp.open_browser = False
 c.NotebookApp.port = 8888
 
 c.NotebookApp.token = '890'
-```　
+```
 
-### 使ってみる 
+### 使ってみる
 anaconda(もしくはjupyerに)にpathを通しているなら，編集したいファイルがあるディレクトリに移動し，下記のコマンドを入力する。 
 ```　
 jupyer lab 
