@@ -74,11 +74,15 @@ c.NotebookApp.open_browser = False
 
 ## 補足
 細かい設定などは井手さんのホームページなり自分で調べると色々拡張できる。 
+
+### bashの追加 
 一番使うであろうbashスクリプトをjupyter labで編集できるようにする設定を記載する。以下のコマンドをスパコン上で入力すれば良い。 
 ``` 
 pip install bash_kernel
 python -m bash_kernel.install 
 ``` 
 
+### VScode 
+configファイルにsutilを追加すると，VScodeでもスパコン上のファイルを編集することができる。
 
 
