@@ -60,11 +60,7 @@ anaconda(もしくはjupyerに)にpathを通しているなら，編集したい
 ```　
 jupyer lab 
 ```
-その際得られるlogが以下のようになっている。jupyterのconfigファイルにおいて， 
-```
-c.NotebookApp.open_browser = False
-```
-上記のように設定している場合，自動ではブラウザが立ち上がらないので， 
+その際得られるlogが以下のようになっている。 
 ```
 (base) [myne812@gc003 ~]$ jupyter lab
 [I 22:34:33.094 LabApp] JupyterLab extension loaded from /home/myne812/anaconda3/lib/python3.7/site-packages/jupyterlab
@@ -75,6 +71,8 @@ c.NotebookApp.open_browser = False
 [I 22:34:33.127 LabApp]  or http://127.0.0.1:8888/?token=...
 [I 22:34:33.127 LabApp] Use Control-C to stop this server and shut down all kernels (twice to skip confirmation).
 ``` 
+jupyterのconfigファイルにおいて， 
+`c.NotebookApp.open_browser = False`と設定している場合，自動ではブラウザが立ち上がらないので， 
 上記ログのURLのうち，...の部分をjupyterのconfigファイルで設定したtokenに書き換え，好きなブラウザーに貼り付けることでjupyterが立ち上がる。 
 細かい設定などは井手さんのホームページなり自分で調べると色々拡張できる。 
 
