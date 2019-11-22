@@ -1,11 +1,14 @@
-# 東大スパコンでjupyter labの設定 
+# 東大スパコンでjupyter labとVScode
 
 ## 概要 
 Anacondaパッケージに内包されているデータ解析用のIDE。 
 ローカルサーバー上で操作させるため，そのままではssh接続しているリモートのファイルを編集することができない。 
 そこで必要となる設定を，東大スパコンに対して行なった結果を記載する。
+(追記)
+VScodeの設定を追加した，個人的にはjupyterよりも便利だと思うので利用していきたい。
 
-詳しい説明は[井手さんのホームページ](http://133.9.8.88/~ide/analysis/others/jupyter-notebook/)にあるが，OILスパコンをメインとした説明である。東大スパコンへの設定で自分が手こずった部分を中心に記載する。 
+詳しい説明は[井手さんのホームページ](http://133.9.8.88/~ide/analysis/others/jupyter-notebook/)にあるが，OILスパコンをメインとした説明である。東大スパコンへの設定で自分が手こずった部分を中心に記載する。
+
 
 ## 操作 
 ### スパコン上でのssh configの設定 
@@ -71,8 +74,6 @@ c.NotebookApp.open_browser = False
 [I 22:34:33.127 LabApp] Use Control-C to stop this server and shut down all kernels (twice to skip confirmation).
 ``` 
 ...をjupyterのconfigファイルで設定したtokenに書き換え，好きなブラウザーに貼り付ければjupyterが立ち上がる。 
-
-## 補足
 細かい設定などは井手さんのホームページなり自分で調べると色々拡張できる。 
 
 ### bashの追加 
@@ -82,7 +83,25 @@ pip install bash_kernel
 python -m bash_kernel.install 
 ``` 
 
-### VScode 
-configファイルにsutilを追加すると，VScodeでもスパコン上のファイルを編集することができる。
 
 
+# VScode 
+configファイルにsutilを追加すると，VScodeでもスパコン上のファイルを編集することができる。 
+vimの操作になれない自分にとっては非常に便利で重宝している。 
+
+## 操作
+macならめちゃくちゃ簡単。[このサイト](https://dev.classmethod.jp/etc/vs-code-remote-development-ec2/)を参考にした。
+以下に簡単な設定方法を記載するが，configファイルさえ作成してあれば1分ほどで完了する。
+
+VScodeの拡張機能である，`Remote Development`をインストールする。これで必要な拡張機能が全てインストールされる。
+![install](https://cdn-ssl-devio-img.classmethod.jp/wp-content/uploads/2019/05/030-min2-960x631.png) 
+
+すると左のツールバーにRemote-SSHアイコンが現れる 
+![アイコン](https://cdn-ssl-devio-img.classmethod.jp/wp-content/uploads/2019/05/040-min2.png) 
+
+### アイコンをクリックすると，configファイルに設定された接続先の一覧が表示される。
+![アドレス](https://cdn-ssl-devio-img.classmethod.jp/wp-content/uploads/2019/05/040-min2.png)
+
+接続したいリモート先をクリックするとssh接続される。あとはディレクトリをローカル環境のように移動し，様々なファイルを編集することができる。VScodeの拡張機能を利用することもできるので大変便利である。 
+ドラッグ&ドロップなどでファイルを追加することができないのなどは残念なところ。
+*もちろんターミナル操作もVScode上で行うことができる。*
