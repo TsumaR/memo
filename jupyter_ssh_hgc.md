@@ -1,0 +1,84 @@
+# 東大スパコンでjupyter labの設定 
+
+## 概要 
+Anacondaパッケージに内包されているデータ解析用のIDE。 
+ローカルサーバー上で操作させるため，そのままではssh接続しているリモートのファイルを編集することができない。 
+そこで必要となる設定を，東大スパコンに対して行なった結果を記載する。
+
+詳しい説明は[井手さんのホームページ](http://133.9.8.88/~ide/analysis/others/jupyter-notebook/)にあるが，OILスパコンをメインとした説明である。東大スパコンへの設定で自分が手こずった部分を中心に記載する。 
+
+## 操作 
+### スパコン上でのssh configの設定 
+まず，`vim .ssh/config`でローカルPC上のssh接続の設定ファイルを編集する。 
+ここで，通常操作する際のログインノードは`slogin.hgc.jp`である(正確にはログインノードも２つあり，それぞれに異なるIPアドレスが振られている)が，jupyer labを利用するためには，ロボットのためのログインノードである`sutil.hgc.jp`を利用する点が，東大スパコンで設定する際に注意する点である。 
+このログインノードではqloginした際の計算ノードと同じ環境になっている。　
+```
+Host hgc
+HostName slogin.hgc.jp
+User myne812
+LocalForward 8888 localhost:8888
+
+Host sutil
+HostName 202.175.151.65
+User myne812
+Port 22
+LocalForward 8888 localhost:8888
+``` 
+自分の場合`.ssh/config`ファイルは上記のようにしている。　
+
+### スパコン上のjupyter configファイルを設定する。
+井手さんのconfigファイルをお借りしている。
+```
+jupyter notebook --generate-config
+vi ~/.jupyter/jupyter_notebook_config.py
+```
+で開き，ファイルの最下部に以下を書き加える。
+```
+c = get_config()
+
+# matplotlibで描画したものがnotebook上で表示できるようにする
+c.IPKernelApp.pylab = 'inline'
+# 全てのIPから接続を許可
+c.NotebookApp.ip = '0.0.0.0'
+# IPython notebookのログインパスワード
+#c.NotebookApp.password = 'sha1:f6aaa78c99d3:1229eee791191644436957a2626cf5619a1bad06'
+# 起動時にブラウザを起動させるかの設定(デフォルトは起動させる，自分はTrueにしている。)
+c.NotebookApp.open_browser = False
+# ポート指定(デフォルトは8888)
+c.NotebookApp.port = 8888
+
+c.NotebookApp.token = '890'
+```　
+
+### 使ってみる 
+anaconda(もしくはjupyerに)にpathを通しているなら，編集したいファイルがあるディレクトリに移動し，
+```　
+jupyer lab 
+```
+と打てばjupyter labがローカルサーバー上に立ち上がる。
+```
+c.NotebookApp.open_browser = False
+```
+にしているなら，下記のログから
+```
+(base) [myne812@gc003 ~]$ jupyter lab
+[I 22:34:33.094 LabApp] JupyterLab extension loaded from /home/myne812/anaconda3/lib/python3.7/site-packages/jupyterlab
+[I 22:34:33.094 LabApp] JupyterLab application directory is /home/myne812/anaconda3/share/jupyter/lab
+[I 22:34:33.127 LabApp] Serving notebooks from local directory: /yshare1/home/myne812
+[I 22:34:33.127 LabApp] The Jupyter Notebook is running at:
+[I 22:34:33.127 LabApp] http://gc003:8888/?token=...
+[I 22:34:33.127 LabApp]  or http://127.0.0.1:8888/?token=...
+[I 22:34:33.127 LabApp] Use Control-C to stop this server and shut down all kernels (twice to skip confirmation).
+``` 
+...をjupyterのconfigファイルで設定したtokenに書き換え，好きなブラウザーに貼り付ければjupyterが立ち上がる。 
+
+## 補足
+細かい設定などは井手さんのホームページなり自分で調べると色々拡張できる。 
+一番使うであろうbashスクリプトをjupyter labで編集できるようにする設定を記載する。以下のコマンドをスパコン上で入力すれば良い。 
+``` 
+pip install bash_kernel
+python -m bash_kernel.install 
+``` 
+
+
+
