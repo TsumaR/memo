@@ -25,7 +25,9 @@ $export R_LIBS_USER=/home/myne812/R/3.6.0/lib64/R/library:$R_LIBS_USER
 ## jupyter labで使えるようにする　
 以上の操作を加えたら，jupyter labでRを使うのに必要な`IRkernel`パッケージのインストールも可能になっている。 
 ``` 
+>install.packages("devtools")
 >install.packages("IRkernel") 
+>IRkernel::installspec()
 ```
 を行い，jupyter labでRを自由に操作できるようにした。
 
