@@ -31,3 +31,4 @@ $export R_LIBS_USER=/home/myne812/R/3.6.0/lib64/R/library:$R_LIBS_USER
 ```
 を行い，jupyter labでRを自由に操作できるようにした。
 
+ 
