@@ -68,7 +68,7 @@ samtools view -@ 10 -h virusAligned.sortedByCoord.out.bam | grep "herpesvirus_7"
 その結果をigvで表示した。この際fastaファイルをツールで参照しているウイルス763を含むものにしないと，参照名の違いによりエラーが発生して表示されなかった。
 
 #### リード数が与える影響の確認 
-
+```
 リード数 
 ../P14_E1-01/humanLog.final.out:                          Number of input reads | 38649055
 ../P14_E1-02/humanLog.final.out:                          Number of input reads | 33191521
@@ -81,8 +81,10 @@ samtools view -@ 10 -h virusAligned.sortedByCoord.out.bam | grep "herpesvirus_7"
 ../P14_E1-10/humanLog.final.out:                          Number of input reads | 16698732
 ../P14_E1-11/humanLog.final.out:                          Number of input reads | 17289084
 ../P14_E1-12/humanLog.final.out:                          Number of input reads | 39701191
+``` 
 
 ウイルスにマッピングした際のリード数は 
+```
 ../P14_E1-01/virusLog.final.out:                          Number of input reads | 2655508
 ../P14_E1-02/virusLog.final.out:                          Number of input reads | 3124898
 ../P14_E1-03/virusLog.final.out:                          Number of input reads | 2428111
@@ -94,6 +96,7 @@ samtools view -@ 10 -h virusAligned.sortedByCoord.out.bam | grep "herpesvirus_7"
 ../P14_E1-10/virusLog.final.out:                          Number of input reads | 4254719
 ../P14_E1-11/virusLog.final.out:                          Number of input reads | 3842958
 ../P14_E1-12/virusLog.final.out:                          Number of input reads | 5601884 
+```
 
 であり，リード数自体が条件に影響を与えているわけではなさそう。 
 
