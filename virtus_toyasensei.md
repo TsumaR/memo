@@ -49,6 +49,8 @@ cwltool --singularity ../../VIRTUS/workflow/VIRTUS.PE.cwl \
 ``` 
 で動いた。
 
+*** 
+
 ## 処理内容 
 STARでヒトゲノムにマッピングを行い，`samtools view`でunmapを抽出。`bedtools bamtofastq`でそれらをfastqに戻す。[VirTect](https://github.com/WGLab/VirTect)のウイルスゲノムをリファレンスにしてマッピングし，ウイルスにマッピングされる配列を取得する。  
 
