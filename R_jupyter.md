@@ -25,18 +25,23 @@ export R_LIBS_USER=/home/myne812/R/3.6.0/lib64/R/library:$R_LIBS_USER
 IRkernelがきちんと挙動せずに下記のエラー
 ```
 Error opening stream: HTTP 404: Not Found (Kernel does not exist: cf2f9da8-d6f0-4910-aadb-ccc2e753273c)
-```　
+```
 IRkernelは
 ```
 ~/.local/share/jupyter/kernels/ir/
 ```
 に設定される。ここにR3.5.0の設定が残っていたことがR3.6.0を使おうとしたときにエラーが生じた原因だった。
 
+
 # 未解決問題点 
+
+下記のログが出続ける。R 3.6.0なのだが
 ```
  呼び出し:  cat ... system.file -> find.package -> lapply -> FUN -> readRDS
  実行が停止されました
  readRDS(pfile) でエラー:
    R 3.6.0 により書かれたバージョン 3 のワークスペースを読み取ることができません。R 3.5.0 もしくはそれ以上が必要です
 ``` 
-下記のログが出続ける。R 3.6.0なのだが，，，
+
+### この記事はMuSiCのチュートリアルを動かしたときに記載した 
+(2020/03/27)
