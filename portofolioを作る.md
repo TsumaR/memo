@@ -17,23 +17,22 @@ git init
 git add .
 git commit -m 'Initial commit'
 ```
+
 ## HUGOテーマのintroductionをsubmoduleとして導入 
+
 今回のportfolioにはHUGOの[introduction](https://themes.gohugo.io/hugo-theme-introduction/)テーマを用いた。
 先ほど作成したportfolioディレクトリに上記のテーマのサブモジュールを追加する。
 *(注釈)*
 git submodule は、外部の git リポジトリを、自分の git リポジトリのサブディレクトリとして登録し、特定の commit を参照する仕組みです。
 通常のレポジトリがブランチ単位で管理するのに対して，サブモジュールはCommitID単位で管理するというのが大きな違い。
 `push`権限のため，自分のgithubにフォークしたレポジトリのサブモジュールを加えた。この方法が正しいのかは不確か。
+
 ```
 git submodule add https://github.com/TsumaR/hugo-theme-introduction.git themes/introduction
 git submodule init
 git submodule update
 git submodule update —remote themes/introduction
 ``` 
-
-
-
-
 
 ```
 git merge --allow-unrelated-histories origin/master
@@ -68,15 +67,25 @@ hugo server
 ```
 上記のコマンドにより，ポート1313のローカルサーバーが立ち上がる。ブラウザから`http://localhost:1313/`にアクセスして挙動を確認する。
 
-# netlifyでの公開 
+## netlifyでの公開 
 次に作成したホームページを公開する。
 ```
 hugo
 ```
 でpublicディレクトリの作成。さらに，netlifyの公式[サイト](https://gohugo.io/hosting-and-deployment/hosting-on-netlify/)よりコピーした`netlify.toml`を[これらのサイト](https://qiita.com/jrfk/items/4c6df87ca72a76e30224)を参考にして修正。
 
-[参考文献1](https://blog.tomoya.dev/2019/01/hugo-with-netlify/)
+## ここまででのエラー　
+* 1. 写真が表示されない　
+* 2. latest postなどの表示がない　
+* 3. 記事を全部見るなどのページに飛んでいくリンクもページも存在しない 
 
+### 1. 写真が表示されないについて
+SSL認証による可能性があるので，独自ドメインを取得して，HTTPS設定をした。
+参考にしたのはこの[サイト](https://jamstack.jp/blog/how_to_set_custom_domain/)
+Netlifyではwwwありドメインを強く推奨しているらしい。
+
+[参考文献1](https://blog.tomoya.dev/2019/01/hugo-with-netlify/)
+[参考文献2](https://r17n.page/2019/07/24/create-hexo-blog-process/)
 
 
 # 注意　

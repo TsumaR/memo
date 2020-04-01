@@ -1,4 +1,4 @@
-### Seura tutorialを行なって
+### Seurat tutorialを行なって
 single cell解析パイプラインであるSeuraのtutorialを行なってみて，今後全ての解析において注意していかないといけない，いくつかの事柄があったので記載する。  
 
 ### データのスケーリング（線形変換)
